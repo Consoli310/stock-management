@@ -1,7 +1,6 @@
 package controllers;
 
 import entities.Product;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,23 +14,20 @@ public class ProductController {
     @Autowired
     ProductServices productServices;
 
-    public ProductController(ProductServices productServices) {
-        this.productServices = productServices;
-    }
 
-    @GetMapping(path = "/products")
+    @GetMapping(path = "/products/get")
     public ResponseEntity<List<Product>> getAll() {
         List<Product> products = productServices.getAll();
         return ResponseEntity.ok(products);
     }
 
-    @GetMapping(path = "/products/{id}")
+    @GetMapping(path = "/products/get/{id}")
     public ResponseEntity<Product> getById(@PathVariable Long id) {
         return ResponseEntity.of(productServices.getById(id));
     }
 
 
-    @DeleteMapping(path = "/products/{id}")
+    @DeleteMapping(path = "/products/delete/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id){
         if (productServices.deleteById(id)){
             return ResponseEntity.noContent().build();
@@ -40,8 +36,8 @@ public class ProductController {
         }
     }
 
-    @PostMapping (path = "/products")
-    public ResponseEntity<Product> addProduct(@Valid @RequestBody Product product){
+    @PostMapping (path = "/products/add")
+    public ResponseEntity<Product> addProduct(@RequestBody Product product){
         Product savedProduct = productServices.save(product);
         return ResponseEntity.ok(savedProduct);
     }

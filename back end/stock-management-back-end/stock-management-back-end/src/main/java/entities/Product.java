@@ -11,9 +11,7 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @NotBlank(message = "O nome não pode ser vazio.")
     private String name;
-    @NotNull(message = "O produto deve ter um preço")
     private Double price;
     private Integer quantity;
 
