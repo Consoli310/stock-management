@@ -15,7 +15,7 @@ public class Product {
     private String name;
     @NotNull(message = "O produto deve ter um preço")
     private Double price;
-    private String quantity;
+    private Integer quantity;
 
     public Long getId() {
         return id;
@@ -37,11 +37,11 @@ public class Product {
         this.price = price;
     }
 
-    public String getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(String quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 }
