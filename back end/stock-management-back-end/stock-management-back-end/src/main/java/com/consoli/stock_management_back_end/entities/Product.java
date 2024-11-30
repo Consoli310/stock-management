@@ -1,4 +1,4 @@
-package entities;
+package com.consoli.stock_management_back_end.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

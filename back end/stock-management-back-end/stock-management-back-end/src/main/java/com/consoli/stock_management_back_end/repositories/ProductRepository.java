@@ -1,6 +1,6 @@
-package repositories;
+package com.consoli.stock_management_back_end.repositories;
 
-import entities.Product;
+import com.consoli.stock_management_back_end.entities.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

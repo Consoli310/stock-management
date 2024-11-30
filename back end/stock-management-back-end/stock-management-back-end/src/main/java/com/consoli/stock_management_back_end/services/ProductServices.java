@@ -1,10 +1,10 @@
-package services;
+package com.consoli.stock_management_back_end.services;
 
 
-import entities.Product;
+import com.consoli.stock_management_back_end.entities.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import repositories.ProductRepository;
+import com.consoli.stock_management_back_end.repositories.ProductRepository;
 
 import java.util.List;
 import java.util.Optional;

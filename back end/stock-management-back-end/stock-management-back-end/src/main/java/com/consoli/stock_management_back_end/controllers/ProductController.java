@@ -1,14 +1,15 @@
-package controllers;
+package com.consoli.stock_management_back_end.controllers;
 
-import entities.Product;
+import com.consoli.stock_management_back_end.entities.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import services.ProductServices;
+import com.consoli.stock_management_back_end.services.ProductServices;
 
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://127.0.0.1:5500")
 public class ProductController {
 
     @Autowired
@@ -36,11 +37,16 @@ public class ProductController {
         }
     }
 
-    @PostMapping (path = "/products/add")
-    public ResponseEntity<Product> addProduct(@RequestBody Product product){
+    @PostMapping(path = "/products/add")
+    public ResponseEntity<Product> addProduct(@RequestBody Product product) {
+        if (product.getQuantity() == null || product.getPrice() == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
         Product savedProduct = productServices.save(product);
         return ResponseEntity.ok(savedProduct);
     }
+
 
     @GetMapping("/test")
     public String test() {

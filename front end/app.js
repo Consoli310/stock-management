@@ -1,125 +1,91 @@
-// Selecionar os elementos do DOM
+// Alternar telas
 const btnAddProduct = document.getElementById("btnAddProduct");
 const btnViewList = document.getElementById("btnViewList");
-const addProductScreen = document.getElementById("addProductScreen");
-const viewListScreen = document.getElementById("viewListScreen");
 const screens = document.querySelectorAll(".screen");
-
-// Função para alternar entre as telas
-function showScreen(screenId) {
-  screens.forEach(screen => screen.classList.remove("active"));
-  document.getElementById(screenId).classList.add("active");
-}
-
-// Adicionar eventos aos botões
-btnAddProduct.addEventListener("click", () => showScreen("addProductScreen"));
-btnViewList.addEventListener("click", () => showScreen("viewListScreen"));
-
-// Mostrar a tela inicial
-showScreen("addProductScreen");
-
-// Seleção dos elementos de formulário e lista
 const addProductForm = document.getElementById("addProductForm");
 const productList = document.getElementById("productList");
 
-// Lógica para adicionar um produto (enviando dados ao back-end)
+function showScreen(screenId) {
+  screens.forEach((screen) => screen.classList.remove("active"));
+  document.getElementById(screenId).classList.add("active");
+}
+
+// Alternar entre as telas de adicionar produto e lista de produtos
+btnAddProduct.addEventListener("click", () => showScreen("addProductScreen"));
+btnViewList.addEventListener("click", async () => {
+  await loadProductList();
+  showScreen("viewListScreen");
+});
+
+// Adicionar produto via API (Spring Boot)
 addProductForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  
-  // Capturar valores do formulário
-  const productName = document.getElementById("productName").value;
-  const productQty = document.getElementById("productQty").value;
-  const productPrice = document.getElementById("productPrice").value; // Novo campo preço
-  
-  // Validar os campos
-  if (!productName || !productQty || !productPrice) {
-    alert("Todos os campos são obrigatórios.");
+
+  const productName = document.getElementById("productName").value.trim();
+  const productQty = parseInt(document.getElementById("productQty").value);  // parseInt pode retornar NaN
+  const productPrice = parseFloat(document.getElementById("productPrice").value);  // parseFloat também pode retornar NaN
+
+  // Verificando se os dados são válidos antes de enviar
+  if (!productName || isNaN(productQty) || productQty <= 0 || isNaN(productPrice) || productPrice <= 0) {
+    alert("Por favor, preencha todos os campos corretamente.");
     return;
   }
 
-  const newProduct = {
-    name: productName,
-    quantity: productQty,
-    price: productPrice
-  };
-
   try {
-    // Enviar os dados do produto para o back-end via API
-    const response = await fetch("http://localhost:8080/products", {
+    const response = await fetch("http://localhost:8080/products/add", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(newProduct)
+      body: JSON.stringify({
+        name: productName,
+        quantity: productQty,  // Corrigido para "quantity" (não "qty")
+        price: productPrice,
+      }),
     });
 
     if (response.ok) {
-      // Se o produto for criado com sucesso, atualizar a lista de produtos
-      const savedProduct = await response.json();
-      addProductToList(savedProduct);
+      const newProduct = await response.json();
+      alert(`Produto "${newProduct.name}" adicionado com sucesso!`);
+      addProductForm.reset();
     } else {
-      alert("Erro ao adicionar produto");
+      alert("Erro ao adicionar produto. Verifique os dados e tente novamente.");
     }
-
   } catch (error) {
-    console.error("Erro ao enviar o produto:", error);
-    alert("Erro na conexão com o servidor");
+    console.error("Erro:", error);
+    alert("Erro ao conectar com o servidor.");
   }
-
-  // Limpar formulário
-  addProductForm.reset();
 });
 
-// Função para adicionar produto na lista
-function addProductToList(product) {
-  const listItem = document.createElement("li");
-  listItem.textContent = `${product.name} - Quantidade: ${product.quantity} - Preço: R$${product.price}`;
-
-  // Adicionar botão para deletar
-  const deleteButton = document.createElement("button");
-  deleteButton.textContent = "Deletar";
-  deleteButton.addEventListener("click", () => deleteProduct(product.id));
-
-  listItem.appendChild(deleteButton);
-  productList.appendChild(listItem);
-}
-
-// Lógica para carregar a lista de produtos ao exibir a tela de lista
-btnViewList.addEventListener("click", async () => {
-  productList.innerHTML = "<li>Carregando produtos...</li>"; // Exibir mensagem de carregamento
+// Carregar lista de produtos via API (Spring Boot)
+async function loadProductList() {
   try {
-    const response = await fetch("http://localhost:8080/products");
-    if (response.ok) {
-      const products = await response.json();
-      productList.innerHTML = ""; // Limpar a lista antes de exibir
-      products.forEach(product => addProductToList(product));
+    const response = await fetch("http://localhost:8080/products/get");
+
+    if (!response.ok) {
+      throw new Error("Erro ao carregar a lista de produtos.");
+    }
+
+    const products = await response.json();
+
+    productList.innerHTML = "";
+
+    if (products.length === 0) {
+      productList.innerHTML = "<li>Nenhum produto cadastrado.</li>";
     } else {
-      alert("Erro ao carregar produtos");
+      products.forEach((product) => {
+        const listItem = document.createElement("li");
+
+        // Verificar se `quantity` e `price` são válidos antes de exibir
+        const quantity = product.quantity || "Indefinido";
+        const price = product.price ? `R$ ${product.price.toFixed(2)}` : "Indefinido";
+
+        listItem.textContent = `${product.name} - Quantidade: ${quantity} - Preço: ${price}`;
+        productList.appendChild(listItem);
+      });
     }
   } catch (error) {
     console.error("Erro ao carregar produtos:", error);
-    alert("Erro na conexão com o servidor");
-  }
-});
-
-// Lógica para deletar produto
-async function deleteProduct(id) {
-  if (confirm("Tem certeza que deseja deletar este produto?")) {
-    try {
-      const response = await fetch(`http://localhost:8080/products/${id}`, {
-        method: "DELETE"
-      });
-
-      if (response.ok) {
-        alert("Produto deletado com sucesso");
-        // Atualizar a lista após a remoção
-        btnViewList.click();
-      } else {
-        alert("Erro ao deletar produto");
-      }
-    } catch (error) {
-      console.error("Erro ao deletar o produto:", error);
-      alert("Erro na conexão com o servidor");
-    }
+    productList.innerHTML = "<li>Erro ao carregar lista de produtos.</li>";
   }
 }
