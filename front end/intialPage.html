@@ -37,6 +37,24 @@
       <h2>Lista de Produtos</h2>
       <ul id="productList"></ul>
     </section>
+    <!-- Formulário de Atualização -->
+<div id="updateForm" style="display: none;">
+  <h3>Atualizar Produto</h3>
+  <form>
+    <label for="updateName">Nome</label>
+    <input type="text" id="updateName" required>
+
+    <label for="updateQuantity">Quantidade</label>
+    <input type="number" id="updateQuantity" required>
+
+    <label for="updatePrice">Preço</label>
+    <input type="number" id="updatePrice" required>
+
+    <button type="submit">Salvar Alterações</button>
+    <button type="button" onclick="document.getElementById('updateForm').style.display = 'none'">Cancelar</button>
+  </form>
+</div>
+
   </main>
   <script src="app.js"></script>
 </body>
