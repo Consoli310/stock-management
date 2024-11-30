@@ -1,4 +1,4 @@
-package com.consoli.stock_management_back_end;
+package com.consoli.stock_management_back_end.corsConfig;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

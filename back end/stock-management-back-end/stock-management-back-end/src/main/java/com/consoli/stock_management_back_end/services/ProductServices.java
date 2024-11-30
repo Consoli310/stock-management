@@ -36,4 +36,18 @@ public class ProductServices {
     public Product save (Product product){
         return productRepository.save(product);
     }
+
+    public Product updateById(Long id, Product productDetails) {
+        Optional<Product> existingProductOpt = productRepository.findById(id);
+        if (existingProductOpt.isPresent()) {
+            Product existingProduct = existingProductOpt.get();
+            existingProduct.setName(productDetails.getName());
+            existingProduct.setPrice(productDetails.getPrice());
+            existingProduct.setQuantity(productDetails.getQuantity());
+
+            return productRepository.save(existingProduct);
+        } else {
+            return null;
+        }
+    }
 }

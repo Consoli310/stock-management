@@ -2,6 +2,7 @@ package com.consoli.stock_management_back_end.controllers;
 
 import com.consoli.stock_management_back_end.entities.Product;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.consoli.stock_management_back_end.services.ProductServices;
@@ -51,5 +52,15 @@ public class ProductController {
     @GetMapping("/test")
     public String test() {
         return "API funcionando!";
+    }
+
+    @PutMapping("/products/update/{id}")
+    public ResponseEntity<Product> updateById(@PathVariable Long id, @RequestBody Product productDetails) {
+        Product updatedProduct = productServices.updateById(id, productDetails);
+        if (updatedProduct != null) {
+            return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
